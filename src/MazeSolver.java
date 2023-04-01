@@ -5,7 +5,13 @@
  */
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Stack;
+import java.util.LinkedList;
+import java.util.Queue;
 
+
+// David Mhatre Friday, March 31
 public class MazeSolver {
     private Maze maze;
 
@@ -29,7 +35,22 @@ public class MazeSolver {
     public ArrayList<MazeCell> getSolution() {
         // TODO: Get the solution from the maze
         // Should be from start to end cells
-        return null;
+        // Declares an arraylist and a stack to keep track of cells
+        ArrayList<MazeCell> solution = new ArrayList<>();
+        Stack<MazeCell> path = new Stack<>();
+        // Sets cur cell and pushes it to path
+        MazeCell cur = maze.getEndCell();
+        path.push(cur);
+        // Tracks back through the maze and keeps track
+        while (path.peek() != maze.getStartCell()){
+            cur = cur.getParent();
+            path.push(cur);
+        }
+        // After reverses the stack and returns it
+        while (!path.isEmpty()){
+            solution.add(path.pop());
+        }
+        return solution;
     }
 
     /**
@@ -39,7 +60,24 @@ public class MazeSolver {
     public ArrayList<MazeCell> solveMazeDFS() {
         // TODO: Use DFS to solve the maze
         // Explore the cells in the order: NORTH, EAST, SOUTH, WEST
-        return null;
+        // Declares the current one and to be explored mazecells this time a stack
+        MazeCell cur = maze.getStartCell();
+        Stack<MazeCell> tbe = new Stack<>();
+
+        while (cur != maze.getEndCell()){
+            // Gets the current row and col
+            int row = cur.getRow();
+            int col = cur.getCol();
+            // In the order of north, east, south, and west set cell for the Stack tbe
+                setSCell(row -1, col, cur, tbe);
+                setSCell(row, col +1, cur, tbe);
+                setSCell(row +1, col, cur, tbe);
+                setSCell(row, col -1, cur, tbe);
+            // Pops the current one off the stack
+            cur = tbe.pop();
+        }
+        // Gets the solution
+        return getSolution();
     }
 
     /**
@@ -49,7 +87,43 @@ public class MazeSolver {
     public ArrayList<MazeCell> solveMazeBFS() {
         // TODO: Use BFS to solve the maze
         // Explore the cells in the order: NORTH, EAST, SOUTH, WEST
-        return null;
+        // Declares the current one and to be explored mazecells this time a Queue
+        MazeCell cur = maze.getStartCell();
+        Queue<MazeCell> tbe = new LinkedList<>();
+
+        while (cur != maze.getEndCell()){
+            // Gets the current row and col
+            int row = cur.getRow();
+            int col = cur.getCol();
+
+            // Again and in the order of north, east, south, and west calls set cell for Queue named tbe
+                setQCell(row -1, col, cur, tbe);
+                setQCell(row, col +1, cur, tbe);
+                setQCell(row +1, col, cur, tbe);
+                setQCell(row, col -1, cur, tbe);
+            // Polls the first one of the Queue
+            cur = tbe.poll();
+        }
+        // Returns get solution
+        return getSolution();
+    }
+
+    // Two methods that make the code more efficient
+    public void setSCell(int row, int col, MazeCell cur, Stack tbe){
+        // Checks if valid then sets the parent and explored then adds it
+        if (maze.isValidCell(row, col) && !tbe.contains(maze.getCell(row, col))){
+            maze.getCell(row, col).setParent(cur);
+            maze.getCell(row, col).setExplored(true);
+            tbe.push(maze.getCell(row , col));
+        }
+    }
+    public void setQCell(int row, int col, MazeCell cur, Queue tbe){
+        // Checks if valid then sets the parent and explored then adds it
+        if (maze.isValidCell(row, col) && !tbe.contains(maze.getCell(row, col))){
+            maze.getCell(row, col).setParent(cur);
+            maze.getCell(row, col).setExplored(true);
+            tbe.add(maze.getCell(row , col));
+        }
     }
 
     public static void main(String[] args) {
